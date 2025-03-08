@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>룬 문자 점</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: gray;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .rune-box {
+            font-size: 50px;
+            margin: 10px;
+            display: inline-block;
+            visibility: hidden;  /* 페이지 로드 시 룬 문자는 숨김 */
+        }
+        .reverse {
+            transform: rotate(180deg);
+        }
+        .hidden {
+            display: none;
+        }
+        .empty-rune {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;  /* 옅은 회색 배경 */
+            display: inline-block;
+            position: relative;
+        }
+        .empty-rune::before {
+            content: "";
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .question-input {
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+        .question-display {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
+    <script>
+        function getRandomRune() {
+    const runes = [
+        ["ᚠ", "Fehu - 재산, 번영", "ᚠ (역방향) - 손실, 실패"], 
+        ["ᚢ", "Uruz - 힘, 용기", "ᚢ (역방향) - 약함, 무기력"], 
+        ["ᚦ", "Thurisaz - 거대한 힘, 저항", "ᚦ (역방향) - 충동, 위험"],
+        ["ᚨ", "Ansuz - 신들의 메시지", "ᚨ (역방향) - 혼란, 거짓말"],
+        ["ᚱ", "Raido - 여행, 변화", "ᚱ (역방향) - 지연, 정체"],
+        ["ᚲ", "Kenaz - 지식, 계몽", "ᚲ (역방향) - 무지, 혼란"],
+        ["ᚷ", "Gebo - 선물, 파트너십", "ᚷ (역방향) - 불균형, 이기심"],
+        ["ᚹ", "Wunjo - 기쁨, 조화", "ᚹ (역방향) - 불행, 다툼"],
+        ["ᚺ", "Hagalaz - 혼돈, 변화", "ᚺ (역방향) - 파괴, 재앙"],
+        ["ᚾ", "Nauthiz - 필요, 시련", "ᚾ (역방향) - 저항, 고통"],
+        ["ᛁ", "Isa - 정지, 침착", "ᛁ (역방향) - 정체, 고립"],
+        ["ᛃ", "Jera - 수확, 주기", "ᛃ (역방향) - 지연, 예상치 못한 변화"],
+        ["ᛇ", "Eiwaz - 보호, 인내", "ᛇ (역방향) - 혼란, 불안"],
+        ["ᛈ", "Perthro - 운명, 비밀", "ᛈ (역방향) - 숨겨진 위험, 상실"],
+        ["ᛉ", "Algiz - 수호, 본능", "ᛉ (역방향) - 경고, 위험"],
+        ["ᛋ", "Sowilo - 태양, 성공", "ᛋ (역방향) - 자만, 에너지 소진"],
+        ["ᛏ", "Tiwaz - 정의, 용기", "ᛏ (역방향) - 실패, 불공정"],
+        ["ᛒ", "Berkano - 성장, 출산", "ᛒ (역방향) - 정체, 쇠퇴"],
+        ["ᛖ", "Ehwaz - 이동, 신뢰", "ᛖ (역방향) - 불신, 막힘"],
+        ["ᛗ", "Mannaz - 인간, 공동체", "ᛗ (역방향) - 외로움, 배신"],
+        ["ᛚ", "Laguz - 흐름, 직관", "ᛚ (역방향) - 혼란, 약함"],
+        ["ᛜ", "Ingwaz - 창조력, 성취", "ᛜ (역방향) - 지연, 좌절"],
+        ["ᛞ", "Dagaz - 변화, 깨달음", "ᛞ (역방향) - 불확실성, 두려움"],
+        ["ᛟ", "Othala - 유산, 전통", "ᛟ (역방향) - 갈등, 소외"],
+        ["□", "공백 - 미지의 운명", "□ (역방향) - 미지의 운명"] 
+    ];
+
+    const selectedRunes = [];
+    while (selectedRunes.length < 3) {
+        const rune = runes[Math.floor(Math.random() * runes.length)];
+        if (!selectedRunes.includes(rune)) {
+            selectedRunes.push(rune);
+        }
+    }
+
+    const runeBoxes = document.querySelectorAll(".rune-box");
+    const explanation = document.getElementById("explanation");
+    explanation.innerHTML = "";
+
+    selectedRunes.forEach((rune, index) => {
+        const isReversed = Math.random() < 0.5;
+        let symbol = "";
+        let meaning = "";
+
+        if (rune[0] === "□") {
+            // 공백 룬 처리
+            symbol = "<div class='empty-rune'></div>";
+            meaning = "미지의 운명";
+        } else {
+            symbol = isReversed ? rune[0] : rune[0];
+            meaning = isReversed ? rune[2] : rune[1];
+        }
+
+        runeBoxes[index].innerHTML = symbol;
+        if (isReversed && rune[0] !== "□") {
+            runeBoxes[index].classList.add("reverse");  // 역방향 룬에 회전 적용
+        } else {
+            runeBoxes[index].classList.remove("reverse");  // 정방향 룬은 회전 제거
+        }
+
+        explanation.innerHTML += `<p>${meaning}</p>`;
+    });
+
+    explanation.style.display = "none";  // 새 룬 문자 출력 후 해석은 숨김 상태로 유지
+
+    // 버튼 클릭 시 룬 문자 표시
+    runeBoxes.forEach(box => box.style.visibility = 'visible');
+
+    // 해석 보기 버튼을 룬 문자가 있을 때만 보이게
+    document.getElementById("toggle").style.visibility = 'visible';
+    
+    // 입력된 질문 표시
+    const questionInput = document.getElementById("question-input");
+    const questionDisplay = document.getElementById("question-display");
+    questionDisplay.textContent = `당신의 질문: ${questionInput.value}`;
+
+    // 질문 입력 칸 비우기
+    questionInput.value = '';
+}
+
+function toggleVisibility() {
+    const explanation = document.getElementById("explanation");
+    explanation.style.display = explanation.style.display === "none" ? "block" : "none";
+}
+    </script>
+</head>
+<body>
+    <h2>오늘은 어떤 일이!</h2>
+
+    <!-- 질문 입력 칸 추가 -->
+    <input type="text" id="question-input" class="question-input" placeholder="당신의 질문을 입력하세요">
+
+    <!-- 질문이 입력된 후 표시될 영역 -->
+    <div id="question-display" class="question-display"></div>
+
+    <div class="rune-box">ᚠ</div>
+    <div class="rune-box">ᚢ</div>
+    <div class="rune-box">ᚦ</div>
+
+    <p id="toggle" class="toggle" onclick="toggleVisibility()" style="visibility: hidden;">🔍 해석 보기</p>
+    <div id="explanation" class="hidden">
+        <p>Fehu - 재산, 번영</p>
+        <p>Uruz - 힘, 용기</p>
+        <p>Thurisaz - 거대한 힘, 저항</p>
+    </div>
+
+    <button class="button" onclick="getRandomRune()">새로운 룬 문자 받기</button>
+
+    <div class="footer">✨ 제작: <strong>연유🌱</strong></div>
+</body>
+</html>
